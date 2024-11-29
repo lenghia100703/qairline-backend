@@ -1,0 +1,230 @@
+openapi: 3.0.3
+info:
+  description: Express for building RESTful APIs
+  version: 1.0.0
+  title: demo
+tags:
+  - name: admin
+    description: Admin endpoints
+  - name: auth
+    description: Auth endpoints
+  - name: users
+    description: User endpoints
+externalDocs:
+  description: Github
+  url: https://github.com/lenghia100703/base-be-express
+servers:
+  - description: development
+    url: http://localhost:8000
+  - description: production
+    url: https://baobianquycuong.vn
+paths:
+  /health:
+    get:
+      tags: [admin]
+      summary: Health check
+      operationId: healthCheck
+      responses:
+        '200':
+          description: Ok
+        '500':
+          description: Not healthy
+
+  /api/auth/register:
+    post:
+      tags: [auth]
+      summary: Register by email
+      operationId: register
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - password
+                - username
+                - role
+              properties:
+                email:
+                  type: string
+                  format: email
+                  description: User's email
+                password:
+                  type: string
+                  description: User's password
+                  minLength: 6
+                  maxLength: 128
+                username:
+                  type: string
+                  description: User's name
+                  maxLength: 128
+                role:
+                  type: string
+                  description: User's role
+                  enum:
+                    - admin
+                    - user
+                  default: user
+              example: { 'email': 'your@email.com', 'password': '*********', 'username': 'your name', 'role': 'user' }
+      responses:
+        '201':
+          description: User Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+
+
+
+  /api/auth/login:
+    post:
+      tags: [ auth ]
+      summary: Login by email
+      operationId: loginByEmail
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - password
+              properties:
+                email:
+                  type: string
+                  format: email
+                  description: User's email
+                password:
+                  type: string
+                  description: User's password
+                  minLength: 6
+                  maxLength: 128
+              example: { 'email': 'your@email.com', 'password': '*********' }
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+
+components:
+  securitySchemes:
+    jwt:
+      type: apiKey
+      in: header
+      name: Authorization
+      description: JWT Authentication
+  requestBodies:
+    UserArray:
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/User'
+      description: List of user object
+      required: true
+  responses:
+    BadRequest:
+      description: 'Bad Request: Some parameters may contain invalid values'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Message'
+          example: { 'message': 'Something is required' }
+    NotFound:
+      description: Not Found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Message'
+          example: { 'message': 'User 1 not found' }
+    Unauthorized:
+      description: 'Unauthorized: Incorrect email or password'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Message'
+          example: { 'message': 'Invalid access key' }
+    Forbidden:
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Message'
+          example: { 'message': 'Insufficient permission' }
+    InternalServerError:
+      description: Internal Server Error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Message'
+          example: { 'message': 'Server is not running' }
+    OK:
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Message'
+          example: { 'message': 'Successfully' }
+  schemas:
+    Message:
+      type: object
+      properties:
+        message:
+          type: string
+      required:
+        - message
+      example: { 'message': 'Message' }
+    AuthToken:
+      type: object
+      properties:
+        tokenType:
+          type: string
+          description: Access Token's type
+        accessToken:
+          type: string
+          description: Authorization Token
+        refreshToken:
+          type: string
+          description: Token to get a new accessToken after expiration time
+        expiresIn:
+          type: integer
+          description: Access Token's expiration time in miliseconds
+      example: { 'tokenType': 'Bearer', 'accessToken': 'a', 'refreshToken': 'b', 'expiresIn': 123 }
+    User:
+      type: object
+      properties:
+        _id:
+          type: string
+        username:
+          type: string
+        email:
+          type: string
+        role:
+          type: string
+        updatedAt:
+          type: string
+          format: date-time
+        createdAt:
+          type: string
+          format: date-time
+      example: { "_id": "66e4a3b9ece6e0c2ef96dc57", "username": "Minh Nghia", "email": "test123@gmail.com", "role": "user", "createdAt": "2024-09-13T20:42:33.601Z", "updatedAt": "2024-09-13T20:42:33.601Z" }
+    AuthResponse:
+      type: object
+      properties:
+        message:
+          type: string
+        data:
+          $ref: '#/components/schemas/User'
