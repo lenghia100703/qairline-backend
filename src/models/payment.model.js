@@ -1,11 +1,11 @@
-import mongoose from "mongoose";
-import BaseModel from "#models/base";
+import mongoose from 'mongoose'
+import BaseModel from '#models/base'
 
 const paymentSchema = new mongoose.Schema(
     {
         bookingId: {
             type: mongoose.Schema.Types.ObjectId,
-            ref: "Booking",
+            ref: 'Booking',
             required: true,
         },
         paymentMethod: {
@@ -24,10 +24,10 @@ const paymentSchema = new mongoose.Schema(
     {
         timestamps: true,
     }
-);
+)
 
-const baseModel = new BaseModel(paymentSchema);
+const baseModel = new BaseModel(paymentSchema)
 
-const Payment = baseModel.createModel("Payment");
+const Payment = baseModel.createModel('Payment')
 
-export default Payment;
+export default Payment
