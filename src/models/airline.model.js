@@ -1,5 +1,5 @@
-import mongoose from "mongoose";
-import BaseModel from "#models/base";
+import mongoose from 'mongoose'
+import BaseModel from '#models/base'
 
 const airlineSchema = new mongoose.Schema(
     {
@@ -23,15 +23,14 @@ const airlineSchema = new mongoose.Schema(
             required: true,
             trim: true,
         },
-        
     },
     {
         timestamps: true,
     }
-);
+)
 
-const baseModel = new BaseModel(airlineSchema);
+const baseModel = new BaseModel(airlineSchema)
 
-const Airline = baseModel.createModel("Airline");
+const Airline = baseModel.createModel('Airline')
 
-export default Airline;
+export default Airline
