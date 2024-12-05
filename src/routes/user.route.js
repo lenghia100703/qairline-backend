@@ -1,6 +1,6 @@
 import express from 'express'
 import * as userController from '#controllers/user'
-import { authorize, LOGGED_USER } from '#middlewares/auth'
+import { authorize } from '#middlewares/auth'
 
 const router = express.Router()
 
@@ -10,6 +10,6 @@ router //
 
 router //
     .route('/:id')
-    .get(authorize(LOGGED_USER), userController.getUserById)
+    .get(authorize(), userController.getUserById)
 
 export default router

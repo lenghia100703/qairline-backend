@@ -2,9 +2,10 @@ import bcrypt from 'bcryptjs'
 import mongoose from 'mongoose'
 import config from '#configs/environment'
 import BaseModel from '#models/base'
+import { ROLES } from '#constants/role'
 
 const { env } = config
-const roles = ['user', 'admin']
+const roles = [ROLES.USER, ROLES.ADMIN]
 
 const userSchema = new mongoose.Schema(
     {
@@ -36,8 +37,8 @@ const userSchema = new mongoose.Schema(
         role: {
             type: String,
             required: true,
-            enum: roles,
-            default: 'user',
+            enum: Object.values(ROLES),
+            default: ROLES.USER,
         },
         avatar: {
             type: String,
