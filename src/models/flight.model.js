@@ -1,5 +1,6 @@
 import mongoose from 'mongoose'
 import BaseModel from '#models/base'
+import { FLIGHT_STATUS } from '#constants/flightStatus'
 
 const flightSchema = new mongoose.Schema(
     {
@@ -22,14 +23,14 @@ const flightSchema = new mongoose.Schema(
             required: true,
         },
         airportFrom: {
-            type: String,
+            type: mongoose.Schema.Types.ObjectId,
             required: true,
-            trim: true,
+            ref: 'Airport',
         },
         airportTo: {
-            type: String,
+            type: mongoose.Schema.Types.ObjectId,
             required: true,
-            trim: true,
+            ref: 'Airport',
         },
         price: {
             type: Number,
@@ -43,11 +44,13 @@ const flightSchema = new mongoose.Schema(
             type: String,
             required: true,
             trim: true,
+            enum: Object.values(FLIGHT_STATUS),
+            default: FLIGHT_STATUS.NO_STATUS,
         },
     },
     {
         timestamps: true,
-    }
+    },
 )
 
 const baseModel = new BaseModel(flightSchema)

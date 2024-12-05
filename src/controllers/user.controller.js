@@ -1,7 +1,6 @@
 import * as userService from '#services/user'
 
 export const getUserById = async (req, res) => {
-    console.log('user controller')
     await userService.getUserById(req, res, req.params.id)
 }
 

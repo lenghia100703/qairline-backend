@@ -18,7 +18,7 @@ const AirportSchema = new mongoose.Schema(
     },
     {
         timestamps: true,
-    }
+    },
 )
 
 const baseModel = new BaseModel(AirportSchema)

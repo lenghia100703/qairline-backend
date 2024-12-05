@@ -9,12 +9,16 @@ import logger from '#configs/logger'
 import routes from '#routes/index'
 import authConfig from '#configs/auth'
 import openApiMiddleware from '#middlewares/openapi'
+import config from '#configs/environment'
 
 const app = express()
 
 app.use(bodyParser.json())
 app.use(helmet())
-app.use(cors())
+app.use(cors({
+    origin: config.corsOrigin,
+    credentials: true,
+}))
 app.use(pino({ logger }))
 app.use(cookieParser())
 app.use(authConfig)

@@ -34,7 +34,7 @@ export async function updateAirline(req, res) {
     try {
         const airline = await AirlineService.updateAirline(
             req.params.code,
-            req.body
+            req.body,
         )
         if (!airline) {
             return res.status(404).json({ error: 'Airline not found' })

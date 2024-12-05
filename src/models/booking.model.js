@@ -1,16 +1,16 @@
-import mongoose from "mongoose";
-import BaseModel from "#models/base";
+import mongoose from 'mongoose'
+import BaseModel from '#models/base'
 
 const bookingSchema = new mongoose.Schema(
     {
         flightId: {
             type: mongoose.Schema.Types.ObjectId,
-            ref: "Flight",
+            ref: 'Flight',
             required: true,
         },
         userId: {
             type: mongoose.Schema.Types.ObjectId,
-            ref: "User",
+            ref: 'User',
             required: true,
         },
         seatNumber: {
@@ -24,11 +24,11 @@ const bookingSchema = new mongoose.Schema(
     },
     {
         timestamps: true,
-    }
-);
+    },
+)
 
-const baseModel = new BaseModel(bookingSchema);
+const baseModel = new BaseModel(bookingSchema)
 
-const Booking = baseModel.createModel("Booking");
+const Booking = baseModel.createModel('Booking')
 
-export default Booking;
+export default Booking

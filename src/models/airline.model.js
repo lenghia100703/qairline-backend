@@ -26,7 +26,7 @@ const airlineSchema = new mongoose.Schema(
     },
     {
         timestamps: true,
-    }
+    },
 )
 
 const baseModel = new BaseModel(airlineSchema)

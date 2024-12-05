@@ -48,7 +48,7 @@ export async function updateAirport(req, res) {
     try {
         const airport = await AirportService.updateAirport(
             req.params.code,
-            req.body
+            req.body,
         )
         if (!airport) {
             return res.status(404).json({
