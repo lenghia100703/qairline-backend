@@ -1,5 +1,6 @@
 import mongoose from 'mongoose'
 import BaseModel from '#models/base'
+import { PAYMENT_STATUS } from '#constants/paymentStatus'
 
 const paymentSchema = new mongoose.Schema(
     {
@@ -19,6 +20,9 @@ const paymentSchema = new mongoose.Schema(
         status: {
             type: String,
             required: true,
+            trim: true,
+            enum: Object.values(PAYMENT_STATUS),
+            default: PAYMENT_STATUS.PENDING,
         },
     },
     {

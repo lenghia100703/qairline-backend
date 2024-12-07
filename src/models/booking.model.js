@@ -1,5 +1,6 @@
 import mongoose from 'mongoose'
 import BaseModel from '#models/base'
+import { BOOKING_STATUS } from '#constants/bookingStatus'
 
 const bookingSchema = new mongoose.Schema(
     {
@@ -20,6 +21,9 @@ const bookingSchema = new mongoose.Schema(
         status: {
             type: String,
             required: true,
+            trim: true,
+            enum: Object.values(BOOKING_STATUS),
+            default: BOOKING_STATUS.PENDING,
         },
     },
     {

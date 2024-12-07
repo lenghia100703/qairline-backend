@@ -37,7 +37,7 @@ const flightSchema = new mongoose.Schema(
             required: true,
             ref: 'Airport',
         },
-        plainCode: {
+        planeCode: {
             type: String,
             required: true,
             trim: true
@@ -50,6 +50,9 @@ const flightSchema = new mongoose.Schema(
             type: Number,
             required: true,
         },
+        seatsStatus: [{
+            type: Object
+        }],
         status: {
             type: String,
             required: true,

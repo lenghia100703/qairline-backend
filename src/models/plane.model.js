@@ -1,7 +1,7 @@
 import mongoose from 'mongoose'
 import BaseModel from '#models/base'
 
-const plainSchema = new mongoose.Schema(
+const planeSchema = new mongoose.Schema(
     {
         code: {
             type: String,
@@ -39,7 +39,7 @@ const plainSchema = new mongoose.Schema(
     },
 )
 
-const baseModel = new BaseModel(plainSchema)
+const baseModel = new BaseModel(planeSchema)
 
 const Plane = baseModel.createModel('Plane')
 

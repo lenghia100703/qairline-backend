@@ -15,6 +15,10 @@ router
     .get(flightController.getFlightByNumber)
 
 router
+    .route('/update-seat/:flightId')
+    .put(authorize(), flightController.updateSeatStatus)
+
+router
     .route('/:flightId')
     .get(authorize([ROLES.ADMIN]), flightController.getFlightById)
     .put(authorize([ROLES.ADMIN]), flightController.updateFlight)

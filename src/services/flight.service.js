@@ -5,6 +5,7 @@ import { genericNumberFlight } from '#utils/genericNumberFlight'
 import { PAGE, PER_PAGE } from '#constants/pagination'
 import Airport from '#models/airport'
 import Plane from '#models/plane'
+import { SEAT_STATUS } from '#constants/seatStatus'
 
 
 export const createFlight = async (req, res) => {
@@ -14,7 +15,8 @@ export const createFlight = async (req, res) => {
         const airlineId = new mongoose.Types.ObjectId(req.body.airline)
         const airportFrom = await Airport.findById(airportFromId)
         const airportTo = await Airport.findById(airportToId)
-        const plain = await Plane.find({ code: req.body.plainCode })
+        const capacity = parseInt(req.body.capacity)
+        const plane = await Plane.find({ code: req.body.planeCode })
         if (!airportFrom) {
             return res.status(httpStatus.NOT_FOUND).json({
                 message: 'Không tìm thấy sân bay khởi hành',
@@ -25,9 +27,14 @@ export const createFlight = async (req, res) => {
                 message: 'Không tìm thấy sân bay điểm đến',
             })
         }
-        if (!plain) {
+        if (!plane) {
             return res.status(httpStatus.NOT_FOUND).json({
                 message: 'Không tìm thấy máy bay được chỉ định',
+            })
+        }
+        if (capacity < plane.numberOfSeats[0] || capacity > plane.numberOfSeats[1]) {
+            return res.status(httpStatus.BAD_REQUEST).json({
+                message: 'Số lượng sức chứa không phù hợp với máy bay này',
             })
         }
         if (req.body.departureTime >= req.body.arrivalTime) {
@@ -35,18 +42,26 @@ export const createFlight = async (req, res) => {
                 message: 'Thời gian cất cánh và hạ cánh không phù hợp',
             })
         }
-        const flightNumber = genericNumberFlight(req.body.plainCode)
+        const flightNumber = genericNumberFlight(req.body.planeCode)
+        const seats = []
+        for (let i = 1; i < capacity; i++) {
+            seats.push({
+                seatNumber: i,
+                status: SEAT_STATUS.AVAILABLE,
+            })
+        }
         const flight = new Flight({
             name: req.body.name,
             number: flightNumber,
             departureTime: req.body.departureTime,
             arrivalTime: req.body.arrivalTime,
             price: req.body.price,
-            capacity: req.body.capacity,
+            capacity: capacity,
             airportFrom: airportFromId,
             airportTo: airportToId,
             airline: airlineId,
-            plainCode: req.body.plainCode,
+            seats: seats,
+            planeCode: req.body.planeCode,
         })
         await flight.save()
         return res.status(httpStatus.CREATED).json({
@@ -75,7 +90,7 @@ export const getListFlights = async (req, res) => {
             priceFrom,
             capacityTo,
             capacityFrom,
-            plainCode,
+            planeCode,
             status,
         } = req.query
         if (!page || !perPage) {
@@ -98,8 +113,8 @@ export const getListFlights = async (req, res) => {
         if (airportTo) {
             filter.airportTo = new mongoose.Types.ObjectId(airportTo)
         }
-        if (plainCode) {
-            filter.plainCode = plainCode
+        if (planeCode) {
+            filter.planeCode = planeCode
         }
         if (timeStart || timeEnd) {
             filter.$or = []
@@ -230,6 +245,43 @@ export const deleteFlight = async (req, res) => {
     } catch (e) {
         return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({
             message: 'Xóa chuyến bay thất bại',
+        })
+    }
+}
+
+export const updateSeatStatus = async (req, res) => {
+    try {
+        const { flightId } = req.params
+        const flight = await Flight.findById(flightId)
+        let isValidSeat = false
+        if (!flight) {
+            return res.status(httpStatus.NOT_FOUND).json({
+                message: 'Không tìm thấy chuyến bay',
+            })
+        }
+        if (!Array.isArray(flight.seats) || flight.seats.length === 0) {
+            return res.status(httpStatus.BAD_REQUEST).json({
+                message: 'Danh sách ghế ngồi không hợp lệ',
+            })
+        }
+        flight.seats.forEach((seat) => {
+            if (seat.seatNumber === parseInt(req.body.seatNumber)) {
+                seat.status = req.body.status
+                isValidSeat = true
+            }
+        })
+        if (!isValidSeat) {
+            return res.status(httpStatus.BAD_REQUEST).json({
+                message: 'Ghế ngồi bạn chọn không tồn tại hoặc đã có người đặt',
+            })
+        }
+        await flight.save()
+        return res.status(httpStatus.OK).json({
+            message: 'Cập nhật trạng thái ghế thành công',
+        })
+    } catch (e) {
+        return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({
+            message: 'Cập nhật trạng thái ghế thất bại',
         })
     }
 }
