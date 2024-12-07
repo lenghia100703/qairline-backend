@@ -1,5 +1,4 @@
 import Airport from '#models/airport'
-import Airline from '../models/airline.model.js'
 import httpStatus from 'http-status'
 import { PAGE, PER_PAGE } from '#constants/pagination'
 
@@ -41,7 +40,7 @@ export const getAirportByCode = async (req, res) => {
 export const getAirportById = async (req, res) => {
     try {
         const { airportId } = req.params
-        const airport = await Airline.findById(airportId)
+        const airport = await Airport.findById(airportId)
         if (!airport) {
             return res.status(httpStatus.NOT_FOUND).json({
                 message: 'Không tìm thấy sân bay',
@@ -66,7 +65,7 @@ export const getListAirports = async (req, res) => {
             code,
             name,
             country,
-            location
+            location,
         } = req.query
         if (!page || !perPage) {
             page = PAGE
@@ -145,15 +144,15 @@ export const deleteAirport = async (req, res) => {
         const deletedAirport = await Airport.findByIdAndDelete(airportId)
         if (!deletedAirport) {
             return res.status(httpStatus.NOT_FOUND).json({
-                message: 'Không tìm thấy hãng máy bay',
+                message: 'Không tìm thấy sân bay',
             })
         }
         return res.status(httpStatus.OK).json({
-            message: 'Xóa hãng máy bay thành công',
+            message: 'Xóa sân bay thành công',
         })
     } catch (e) {
         return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({
-            message: 'Xóa hãng máy bay thất bại',
+            message: 'Xóa sân bay thất bại',
         })
     }
 }
