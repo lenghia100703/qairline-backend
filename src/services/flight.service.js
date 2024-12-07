@@ -3,7 +3,6 @@ import httpStatus from 'http-status'
 import mongoose from 'mongoose'
 import { genericNumberFlight } from '#utils/genericNumberFlight'
 import { PAGE, PER_PAGE } from '#constants/pagination'
-import User from '#models/user'
 import Airport from '#models/airport'
 import Plane from '#models/plane'
 

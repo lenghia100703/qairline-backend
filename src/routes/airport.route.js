@@ -5,16 +5,19 @@ import { ROLES } from '#constants/role'
 
 const router = express.Router()
 
-router.route('/all-airport').get(airportController.getAllAirports)
 
 router
     .route('')
-    .get(airportController.getAllAirports)
+    .get(airportController.getListAirports)
     .post(authorize([ROLES.ADMIN]), airportController.createAirport)
 
 router
-    .route('/:code')
+    .route('/code/:code')
     .get(airportController.getAirportByCode)
+
+router
+    .route('/:airportId')
+    .get(authorize([ROLES.ADMIN]), airportController.getAirportById)
     .put(authorize([ROLES.ADMIN]), airportController.updateAirport)
     .delete(authorize([ROLES.ADMIN]), airportController.deleteAirport)
 

@@ -6,14 +6,28 @@ const AirportSchema = new mongoose.Schema(
         code: {
             type: String,
             required: true,
+            trim: true,
         },
         name: {
             type: String,
             required: true,
+            trim: true,
+        },
+        country: {
+            type: String,
+            trim: true,
+        },
+        longitude: {
+            type: Number,
+            required: true,
+        },
+        latitude: {
+            type: Number,
+            required: true,
         },
         location: {
             type: String,
-            required: true,
+            trim: true,
         },
     },
     {
