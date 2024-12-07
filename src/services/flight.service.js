@@ -3,23 +3,51 @@ import httpStatus from 'http-status'
 import mongoose from 'mongoose'
 import { genericNumberFlight } from '#utils/genericNumberFlight'
 import { PAGE, PER_PAGE } from '#constants/pagination'
-import User from '../models/user.model.js'
+import User from '#models/user'
+import Airport from '#models/airport'
+import Plane from '#models/plane'
 
 
 export const createFlight = async (req, res) => {
     try {
-        const number = genericNumberFlight()
         const airportToId = new mongoose.Types.ObjectId(req.body.airportTo)
         const airportFromId = new mongoose.Types.ObjectId(req.body.airportFrom)
+        const airlineId = new mongoose.Types.ObjectId(req.body.airline)
+        const airportFrom = await Airport.findById(airportFromId)
+        const airportTo = await Airport.findById(airportToId)
+        const plain = await Plane.find({ code: req.body.plainCode })
+        if (!airportFrom) {
+            return res.status(httpStatus.NOT_FOUND).json({
+                message: 'Không tìm thấy sân bay khởi hành',
+            })
+        }
+        if (!airportTo) {
+            return res.status(httpStatus.NOT_FOUND).json({
+                message: 'Không tìm thấy sân bay điểm đến',
+            })
+        }
+        if (!plain) {
+            return res.status(httpStatus.NOT_FOUND).json({
+                message: 'Không tìm thấy máy bay được chỉ định',
+            })
+        }
+        if (req.body.departureTime >= req.body.arrivalTime) {
+            return res.status(httpStatus.BAD_REQUEST).json({
+                message: 'Thời gian cất cánh và hạ cánh không phù hợp',
+            })
+        }
+        const flightNumber = genericNumberFlight(req.body.plainCode)
         const flight = new Flight({
             name: req.body.name,
-            number: number,
+            number: flightNumber,
             departureTime: req.body.departureTime,
             arrivalTime: req.body.arrivalTime,
             price: req.body.price,
             capacity: req.body.capacity,
             airportFrom: airportFromId,
             airportTo: airportToId,
+            airline: airlineId,
+            plainCode: req.body.plainCode,
         })
         await flight.save()
         return res.status(httpStatus.CREATED).json({
@@ -48,6 +76,7 @@ export const getListFlights = async (req, res) => {
             priceFrom,
             capacityTo,
             capacityFrom,
+            plainCode,
             status,
         } = req.query
         if (!page || !perPage) {
@@ -55,12 +84,12 @@ export const getListFlights = async (req, res) => {
             perPage = PER_PAGE
         }
         if (name) {
-            filter.city = {
+            filter.name = {
                 $regex: new RegExp(name, 'i'),
             }
         }
         if (number) {
-            filter.city = {
+            filter.number = {
                 $regex: new RegExp(number, 'i'),
             }
         }
@@ -69,6 +98,9 @@ export const getListFlights = async (req, res) => {
         }
         if (airportTo) {
             filter.airportTo = new mongoose.Types.ObjectId(airportTo)
+        }
+        if (plainCode) {
+            filter.plainCode = plainCode
         }
         if (timeStart || timeEnd) {
             filter.$or = []
@@ -86,9 +118,6 @@ export const getListFlights = async (req, res) => {
         }
         if (priceFrom) {
             filter.price = { ...filter.price, $gte: parseFloat(priceFrom) }
-        }
-        if (priceTo) {
-            filter.price = { ...filter.price, $lte: parseFloat(priceTo) }
         }
         if (capacityTo) {
             filter.capacity = { ...filter.capacity, $gte: parseInt(capacityTo) }
@@ -126,7 +155,28 @@ export const getListFlights = async (req, res) => {
 export const getFlightById = async (req, res) => {
     try {
         const { flightId } = req.params
+        console.log(flightId)
         const flight = await Flight.findById(flightId)
+        if (!flight) {
+            return res.status(httpStatus.NOT_FOUND).json({
+                message: 'Không tìm thấy chuyến bay',
+            })
+        }
+        return res.status(httpStatus.OK).json({
+            data: flight,
+            message: 'Lấy thông tin chuyến bay thành công',
+        })
+    } catch (e) {
+        return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({
+            message: 'Không tìm thấy chuyến bay',
+        })
+    }
+}
+
+export const getFlightByNumber = async (req, res) => {
+    try {
+        const { flightNumber } = req.params
+        const flight = await Flight.findOne({ number: flightNumber })
         if (!flight) {
             return res.status(httpStatus.NOT_FOUND).json({
                 message: 'Không tìm thấy chuyến bay',
@@ -146,13 +196,6 @@ export const getFlightById = async (req, res) => {
 export const updateFlight = async (req, res) => {
     try {
         const { flightId } = req.params
-        const userId = req.user._id
-        const user = await User.findById(userId)
-        if (!user) {
-            return res.status(httpStatus.NOT_FOUND).json({
-                message: 'Người dùng không tồn tại',
-            })
-        }
         const updatedFlight = await Flight.findByIdAndUpdate(
             flightId,
             req.body,

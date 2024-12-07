@@ -19,3 +19,7 @@ export async function updateFlight(req, res) {
 export async function deleteFlight(req, res) {
     await flightService.deleteFlight(req, res)
 }
+
+export async function getFlightByNumber(req, res) {
+    await flightService.getFlightByNumber(req, res)
+}

@@ -7,12 +7,16 @@ const router = express.Router()
 
 router
     .route('')
-    .get(airlineController.getAllAirlines)
+    .get(airlineController.getListAirlines)
     .post(authorize([ROLES.ADMIN]), airlineController.createAirline)
 
 router
-    .route('/:code')
+    .route('/code/:code')
     .get(airlineController.getAirlineByCode)
+
+router
+    .route('/:airlineId')
+    .get(authorize([ROLES.ADMIN]), airlineController.getAirlineById)
     .put(authorize([ROLES.ADMIN]), airlineController.updateAirline)
     .delete(authorize([ROLES.ADMIN]), airlineController.deleteAirline)
 

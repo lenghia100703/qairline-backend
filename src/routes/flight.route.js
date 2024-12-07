@@ -11,8 +11,12 @@ router
     .post(authorize([ROLES.ADMIN]), flightController.createFlight)
 
 router
-    .route('/:id')
-    .get(flightController.getFlightById)
+    .route('/number/:flightNumber')
+    .get(flightController.getFlightByNumber)
+
+router
+    .route('/:flightId')
+    .get(authorize([ROLES.ADMIN]), flightController.getFlightById)
     .put(authorize([ROLES.ADMIN]), flightController.updateFlight)
     .delete(authorize([ROLES.ADMIN]), flightController.deleteFlight)
 

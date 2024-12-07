@@ -22,6 +22,11 @@ const flightSchema = new mongoose.Schema(
             type: Date,
             required: true,
         },
+        airline: {
+            type: mongoose.Schema.Types.ObjectId,
+            required: true,
+            ref: 'Airline',
+        },
         airportFrom: {
             type: mongoose.Schema.Types.ObjectId,
             required: true,
@@ -31,6 +36,11 @@ const flightSchema = new mongoose.Schema(
             type: mongoose.Schema.Types.ObjectId,
             required: true,
             ref: 'Airport',
+        },
+        plainCode: {
+            type: String,
+            required: true,
+            trim: true
         },
         price: {
             type: Number,

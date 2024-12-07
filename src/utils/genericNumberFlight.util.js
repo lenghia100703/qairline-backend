@@ -1,6 +1,17 @@
-export const genericNumberFlight = () => {
+let dailyCounter = 0
+let lastResetDate = null
+
+export const genericNumberFlight = (code) => {
     const today = new Date()
-    const datePart = today.toISOString().slice(2, 10).replace(/-/g, '')
-    const randomPart = Math.random().toString(36).substring(2, 10).toUpperCase()
-    return `${datePart}${randomPart}`
+    const currentDate = today.toISOString().slice(0, 10)
+    if (lastResetDate !== currentDate) {
+        dailyCounter = 0
+        lastResetDate = currentDate
+    }
+    const incrementPart = dailyCounter++
+    const day = today.getDate().toString().padStart(2, '0')
+    const month = (today.getMonth() + 1).toString().padStart(2, '0')
+    const year = today.getFullYear().toString().slice(2, 4)
+    const datePart = `${day}${month}${year}`
+    return `${code}${datePart}${incrementPart.toString().padStart(1, '0')}`
 }
