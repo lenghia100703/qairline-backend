@@ -1,5 +1,4 @@
 import * as flightService from '#services/flight'
-import { updateSeatStatus } from '#services/flight'
 
 export async function createFlight(req, res) {
     await flightService.createFlight(req, res)
