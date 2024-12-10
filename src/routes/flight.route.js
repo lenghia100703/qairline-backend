@@ -16,7 +16,7 @@ router
 
 router
     .route('/update-seat/:flightId')
-    .put(authorize(), flightController.updateSeatStatus)
+    .put(authorize(), flightController.updateSeatInfo)
 
 router
     .route('/:flightId')

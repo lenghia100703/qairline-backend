@@ -15,8 +15,13 @@ const bookingSchema = new mongoose.Schema(
             required: true,
         },
         seatNumber: {
+            type: Number,
+            required: true,
+        },
+        seatType: {
             type: String,
             required: true,
+            trim: true,
         },
         status: {
             type: String,

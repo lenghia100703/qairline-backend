@@ -24,6 +24,6 @@ export async function getFlightByNumber(req, res) {
     await flightService.getFlightByNumber(req, res)
 }
 
-export async function updateSeatStatus(req, res) {
-    await flightService.updateSeatStatus(req, res)
+export async function updateSeatInfo(req, res) {
+    await flightService.updateSeatInfo(req, res)
 }

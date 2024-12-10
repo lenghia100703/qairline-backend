@@ -5,7 +5,9 @@ import { genericNumberFlight } from '#utils/genericNumberFlight'
 import { PAGE, PER_PAGE } from '#constants/pagination'
 import Airport from '#models/airport'
 import Plane from '#models/plane'
-import { SEAT_STATUS } from '#constants/seatStatus'
+import { SEAT_STATUS, SEAT_TYPE } from '#constants/seatStatus'
+import User from '#models/user'
+import { ROLES } from '#constants/role'
 
 
 export const createFlight = async (req, res) => {
@@ -45,9 +47,17 @@ export const createFlight = async (req, res) => {
         const flightNumber = genericNumberFlight(req.body.planeCode)
         const seats = []
         for (let i = 1; i < capacity; i++) {
+            if (i <= 20) {
+                seats.push({
+                    seatNumber: i,
+                    status: SEAT_STATUS.AVAILABLE,
+                    type: SEAT_TYPE.BUSINESS,
+                })
+            }
             seats.push({
                 seatNumber: i,
                 status: SEAT_STATUS.AVAILABLE,
+                type: SEAT_TYPE.ECONOMY,
             })
         }
         const flight = new Flight({
@@ -169,7 +179,6 @@ export const getListFlights = async (req, res) => {
 export const getFlightById = async (req, res) => {
     try {
         const { flightId } = req.params
-        console.log(flightId)
         const flight = await Flight.findById(flightId)
         if (!flight) {
             return res.status(httpStatus.NOT_FOUND).json({
@@ -249,14 +258,21 @@ export const deleteFlight = async (req, res) => {
     }
 }
 
-export const updateSeatStatus = async (req, res) => {
+export const updateSeatInfo = async (req, res) => {
     try {
         const { flightId } = req.params
+        const userId = req.user._id
         const flight = await Flight.findById(flightId)
+        const user = await User.findById(userId)
         let isValidSeat = false
         if (!flight) {
             return res.status(httpStatus.NOT_FOUND).json({
                 message: 'Không tìm thấy chuyến bay',
+            })
+        }
+        if (!user) {
+            return res.status(httpStatus.NOT_FOUND).json({
+                message: 'Không tìm thấy người dùng',
             })
         }
         if (!Array.isArray(flight.seats) || flight.seats.length === 0) {
@@ -266,6 +282,9 @@ export const updateSeatStatus = async (req, res) => {
         }
         flight.seats.forEach((seat) => {
             if (seat.seatNumber === parseInt(req.body.seatNumber)) {
+                if (user.role === ROLES.ADMIN) {
+                    seat.seatType = req.body.seatType
+                }
                 seat.status = req.body.status
                 isValidSeat = true
             }

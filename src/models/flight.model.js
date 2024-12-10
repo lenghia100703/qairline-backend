@@ -50,7 +50,7 @@ const flightSchema = new mongoose.Schema(
             type: Number,
             required: true,
         },
-        seatsStatus: [{
+        seats: [{
             type: Object
         }],
         status: {
