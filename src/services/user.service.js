@@ -16,7 +16,7 @@ export const getUserById = async (req, res, id) => {
         })
     } catch (e) {
         return res.status(e.status || httpStatus.NOT_FOUND).json({
-            message: e.message || 'Không thể tìm thấy người dùng',
+            message: e.message || 'Lỗi khi tìm người dùng',
         })
     }
 }
@@ -27,7 +27,7 @@ export const getCurrentUser = async (req, res) => {
         await getUserById(req, res, user._id)
     } catch (e) {
         return res.status(e.status || httpStatus.INTERNAL_SERVER_ERROR).json({
-            message: e.message || 'Không thể lấy thông tin người dùng',
+            message: e.message || 'Lỗi khi tìm người dùng',
         })
     }
 }

@@ -14,7 +14,7 @@ export const createPlane = async (req, res) => {
         })
     } catch (e) {
         return res.status(e.status || httpStatus.BAD_REQUEST).json({
-            message: 'Tạo máy bay thất bại',
+            message: 'Lỗi khi tạo máy bay',
         })
     }
 }
@@ -33,7 +33,7 @@ export const getPlaneByCode = async (req, res) => {
         })
     } catch (e) {
         return res.status(e.status || httpStatus.INTERNAL_SERVER_ERROR).json({
-            message: 'Không tìm thấy máy bay',
+            message: 'Lỗi khi tìm máy bay',
         })
     }
 }
@@ -53,7 +53,7 @@ export const getPlaneById = async (req, res) => {
         })
     } catch (e) {
         return res.status(e.status || httpStatus.INTERNAL_SERVER_ERROR).json({
-            message: 'Không tìm thấy máy bay',
+            message: 'Lỗi khi tìm máy bay',
         })
     }
 }
@@ -73,6 +73,7 @@ export const getListPlanes = async (req, res) => {
             page = PAGE
             perPage = PER_PAGE
         }
+        const filter = {}
         if (name) {
             filter.name = {
                 $regex: new RegExp(name, 'i'),
@@ -98,7 +99,6 @@ export const getListPlanes = async (req, res) => {
                 $elemMatch: { $gte: parseInt(seatFrom) },
             }
         }
-        const filter = {}
         let planes, totalPlanes
         if (parseInt(perPage, 10) === -1) {
             planes = await Plane.find(filter)
@@ -117,7 +117,7 @@ export const getListPlanes = async (req, res) => {
         })
     } catch (e) {
         return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({
-            message: 'Lấy danh sách máy bay thất bại',
+            message: 'Lỗi khi lấy danh sách máy bay',
         })
     }
 }
@@ -140,7 +140,7 @@ export const updatePlane = async (req, res) => {
         })
     } catch (e) {
         return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({
-            message: 'Cập nhật máy bay thất bại',
+            message: 'Lỗi khi cập nhật máy bay',
         })
     }
 }
@@ -159,7 +159,7 @@ export const deletePlane = async (req, res) => {
         })
     } catch (e) {
         return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({
-            message: 'Xóa máy bay thất bại',
+            message: 'Lỗi khi xóa máy bay',
         })
     }
 }

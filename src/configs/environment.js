@@ -41,7 +41,12 @@ const env = cleanEnv(process.env, {
     GOOGLE_CLIENT_ID: str(),
     GOOGLE_CLIENT_SECRET: str(),
     GOOGLE_REDIRECT_URI: str(),
-    CORS_ORIGINS: str()
+    CORS_ORIGINS: str(),
+    API_ZALO_URL: str(),
+    APP_ID: str(),
+    KEY_1: str(),
+    KEY_2: str(),
+    REDIRECT_URL: str(),
 })
 
 export default Object.freeze({
@@ -55,20 +60,20 @@ export default Object.freeze({
         repo: env.GITHUB_REPO,
         owner: env.GITHUB_OWNER,
         token: env.GITHUB_TOKEN,
-        baseUrl: env.GITHUB_BASEURL
+        baseUrl: env.GITHUB_BASEURL,
     },
     google: {
         clientId: env.GOOGLE_CLIENT_ID,
         clientSecret: env.GOOGLE_CLIENT_SECRET,
-        redirectUri: env.GOOGLE_REDIRECT_URI
+        redirectUri: env.GOOGLE_REDIRECT_URI,
     },
     corsOrigin: {
-        domain: env.CORS_ORIGINS
+        domain: env.CORS_ORIGINS,
     },
     auth: {
         jwtSecret: env.JWT_SECRET,
         jwtAccessExpiration: env.JWT_ACCESS_EXPIRATION_MINUTES,
-        jwtRefreshExpiration: env.JWT_REFRESH_EXPIRATION_MINUTES
+        jwtRefreshExpiration: env.JWT_REFRESH_EXPIRATION_MINUTES,
     },
     log: {
         format: env.LOG_FORMAT,
@@ -86,5 +91,12 @@ export default Object.freeze({
         port: env.EMAIL_PORT,
         username: env.EMAIL_USERNAME,
         password: env.EMAIL_PASSWORD,
+    },
+    zalo: {
+        apiUrl: env.API_ZALO_URL,
+        appId: env.APP_ID,
+        key1: env.KEY_1,
+        key2: env.KEY_2,
+        redirectUrl: env.REDIRECT_URL,
     },
 })

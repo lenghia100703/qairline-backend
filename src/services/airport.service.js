@@ -32,7 +32,7 @@ export const getAirportByCode = async (req, res) => {
         })
     } catch (e) {
         return res.status(e.status || httpStatus.INTERNAL_SERVER_ERROR).json({
-            message: 'Không tìm thấy sân bay',
+            message: 'Lỗi khi tìm sân bay',
         })
     }
 }
@@ -52,7 +52,7 @@ export const getAirportById = async (req, res) => {
         })
     } catch (e) {
         return res.status(e.status || httpStatus.INTERNAL_SERVER_ERROR).json({
-            message: 'Không tìm thấy sân bay',
+            message: 'Lỗi khi tìm sân bay',
         })
     }
 }
@@ -71,6 +71,7 @@ export const getListAirports = async (req, res) => {
             page = PAGE
             perPage = PER_PAGE
         }
+        const filter = {}
         if (name) {
             filter.name = {
                 $regex: new RegExp(name, 'i'),
@@ -91,7 +92,6 @@ export const getListAirports = async (req, res) => {
                 $regex: new RegExp(location, 'i'),
             }
         }
-        const filter = {}
         let airports, totalAirports
         if (parseInt(perPage, 10) === -1) {
             airports = await Airport.find(filter)
@@ -110,7 +110,7 @@ export const getListAirports = async (req, res) => {
         })
     } catch (e) {
         return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({
-            message: 'Lấy danh sách sân bay thất bại',
+            message: 'Lỗi khi lấy danh sách sân bay',
         })
     }
 }
@@ -133,7 +133,7 @@ export const updateAirport = async (req, res) => {
         })
     } catch (e) {
         return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({
-            message: 'Cập nhật sân bay thất bại',
+            message: 'Lỗi khi cập nhật sân bay',
         })
     }
 }
@@ -152,7 +152,7 @@ export const deleteAirport = async (req, res) => {
         })
     } catch (e) {
         return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({
-            message: 'Xóa sân bay thất bại',
+            message: 'Lỗi khi xóa sân bay',
         })
     }
 }

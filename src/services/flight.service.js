@@ -80,7 +80,7 @@ export const createFlight = async (req, res) => {
         })
     } catch (e) {
         return res.status(e.status || httpStatus.BAD_REQUEST).json({
-            message: 'Tạo chuyến bay thất bại',
+            message: 'Lỗi khi tạo chuyến bay',
         })
     }
 }
@@ -107,6 +107,7 @@ export const getListFlights = async (req, res) => {
             page = PAGE
             perPage = PER_PAGE
         }
+        const filter = {}
         if (name) {
             filter.name = {
                 $regex: new RegExp(name, 'i'),
@@ -152,7 +153,6 @@ export const getListFlights = async (req, res) => {
         if (status) {
             filter.status = status
         }
-        const filter = {}
         let flights, totalFlights
         if (parseInt(perPage, 10) === -1) {
             flights = await Flight.find(filter)
@@ -171,7 +171,7 @@ export const getListFlights = async (req, res) => {
         })
     } catch (e) {
         return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({
-            message: 'Lấy danh sách chuyến bay thất bại',
+            message: 'Lỗi khi lấy danh sách chuyến bay',
         })
     }
 }
@@ -191,7 +191,7 @@ export const getFlightById = async (req, res) => {
         })
     } catch (e) {
         return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({
-            message: 'Không tìm thấy chuyến bay',
+            message: 'Lỗi khi tìm chuyến bay',
         })
     }
 }
@@ -211,7 +211,7 @@ export const getFlightByNumber = async (req, res) => {
         })
     } catch (e) {
         return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({
-            message: 'Không tìm thấy chuyến bay',
+            message: 'Lỗi khi tìm chuyến bay',
         })
     }
 }
@@ -234,7 +234,7 @@ export const updateFlight = async (req, res) => {
         })
     } catch (e) {
         return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({
-            message: 'Cập nhật chuyến bay thất bại',
+            message: 'Lỗi khi cập nhật chuyến bay',
         })
     }
 }
@@ -253,7 +253,7 @@ export const deleteFlight = async (req, res) => {
         })
     } catch (e) {
         return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({
-            message: 'Xóa chuyến bay thất bại',
+            message: 'Lỗi khi xóa chuyến bay',
         })
     }
 }
@@ -300,7 +300,7 @@ export const updateSeatInfo = async (req, res) => {
         })
     } catch (e) {
         return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({
-            message: 'Cập nhật trạng thái ghế thất bại',
+            message: 'Lỗi khi cập nhật trạng thái ghế',
         })
     }
 }

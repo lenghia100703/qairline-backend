@@ -14,15 +14,9 @@ const bookingSchema = new mongoose.Schema(
             ref: 'User',
             required: true,
         },
-        seatNumber: {
-            type: Number,
-            required: true,
-        },
-        seatType: {
-            type: String,
-            required: true,
-            trim: true,
-        },
+        seats: [{
+            type: Object,
+        }],
         status: {
             type: String,
             required: true,

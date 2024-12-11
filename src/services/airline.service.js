@@ -13,7 +13,7 @@ export const createAirline = async (req, res) => {
         })
     } catch (e) {
         return res.status(e.status || httpStatus.BAD_REQUEST).json({
-            message: 'Tạo hãng máy bay thất bại',
+            message: 'Lỗi khi tạo hãng máy bay',
         })
     }
 }
@@ -32,7 +32,7 @@ export const getAirlineByCode = async (req, res) => {
         })
     } catch (e) {
         return res.status(e.status || httpStatus.INTERNAL_SERVER_ERROR).json({
-            message: 'Không tìm thấy hãng máy bay',
+            message: 'Lỗi khi tìm hãng máy bay',
         })
     }
 }
@@ -52,7 +52,7 @@ export const getAirlineById = async (req, res) => {
         })
     } catch (e) {
         return res.status(e.status || httpStatus.INTERNAL_SERVER_ERROR).json({
-            message: 'Không tìm thấy hãng máy bay',
+            message: 'Lỗi khi tìm hãng máy bay',
         })
     }
 }
@@ -70,6 +70,7 @@ export const getListAirlines = async (req, res) => {
             page = PAGE
             perPage = PER_PAGE
         }
+        const filter = {}
         if (name) {
             filter.name = {
                 $regex: new RegExp(name, 'i'),
@@ -85,7 +86,6 @@ export const getListAirlines = async (req, res) => {
                 $regex: new RegExp(operatingCountry, 'i'),
             }
         }
-        const filter = {}
         let airlines, totalAirlines
         if (parseInt(perPage, 10) === -1) {
             airlines = await Airline.find(filter)
@@ -104,7 +104,7 @@ export const getListAirlines = async (req, res) => {
         })
     } catch (e) {
         return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({
-            message: 'Lấy danh sách hãng máy bay thất bại',
+            message: 'Lỗi khi lấy danh sách hãng máy bay',
         })
     }
 }
@@ -127,7 +127,7 @@ export const updateAirline = async (req, res) => {
         })
     } catch (e) {
         return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({
-            message: 'Cập nhật hãng máy bay thất bại',
+            message: 'Lỗi khi cập nhật hãng máy bay',
         })
     }
 }
@@ -146,7 +146,7 @@ export const deleteAirline = async (req, res) => {
         })
     } catch (e) {
         return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({
-            message: 'Xóa hãng máy bay thất bại',
+            message: 'Lỗi khi xóa hãng máy bay',
         })
     }
 }

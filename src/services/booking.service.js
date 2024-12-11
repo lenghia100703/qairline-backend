@@ -9,12 +9,10 @@ export const createBooking = async (req, res) => {
     try {
         const userId = req.user._id
         const flightId = new mongoose.Types.ObjectId(req.body.flightId)
-        const seatNumber = parseInt(req.body.seatNumber)
         const booking = new Booking({
             flightId: flightId,
             userId: userId,
-            seatNumber: seatNumber,
-            seatType: req.body.seatType
+            seats: req.body.seats,
         })
         await booking.save()
         return res.status(httpStatus.CREATED).json({
@@ -23,7 +21,7 @@ export const createBooking = async (req, res) => {
         })
     } catch (e) {
         return res.status(e.status || httpStatus.INTERNAL_SERVER_ERROR).json({
-            message: 'Đặt vé thất bại',
+            message: 'Lỗi khi đặt vé',
         })
     }
 }
@@ -136,7 +134,7 @@ export const updateBooking = async (req, res) => {
         })
     } catch (e) {
         return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({
-            message: 'Cập nhật đặt vé thất bại',
+            message: 'Lỗi khi cập nhật đặt vé',
         })
     }
 }

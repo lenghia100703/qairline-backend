@@ -12,17 +12,18 @@ const { jwtSecret } = config.auth
 export const login = async (req, res) => {
     try {
         const user = await User.findOne({ email: req.body.email })
-
-        if (!user || !(await user.passwordMatches(req.body.password))) {
-            throw new APIError({
-                message: 'Tên đăng nhập hoặc mật khẩu không đúng',
-                status: httpStatus.UNAUTHORIZED,
+        if (!user) {
+            return res.status(httpStatus.NOT_FOUND).json({
+                message: 'Email chưa được đăng ký hoặc bị sai',
             })
         }
-
+        if (!(await user.passwordMatches(req.body.password))) {
+            return res.status(httpStatus.UNAUTHORIZED).json({
+                message: 'Mật khẩu không chính xác',
+            })
+        }
         const accessToken = generateAccessToken(res, user)
         const refreshToken = generateRefreshToken(res, user)
-
         await User.findByIdAndUpdate(user._id,
             {
                 accessToken: accessToken,
@@ -32,7 +33,6 @@ export const login = async (req, res) => {
                 new: true,
             },
         )
-
         return res.status(httpStatus.OK).json({
             message: 'Đăng nhập thành công',
             data: user.transform(),
@@ -52,7 +52,6 @@ export const register = async (req, res) => {
             email: req.body.email,
             role: req.body.role,
         }).save()
-
         return res.status(httpStatus.CREATED).json({
             data: user.transform(),
             message: 'Đăng ký thành công',
@@ -67,7 +66,6 @@ export const register = async (req, res) => {
 export const logout = async (req, res) => {
     try {
         const user = getUserByToken(req, res)
-
         await User.findByIdAndUpdate(user._id,
             {
                 accessToken: '',
@@ -77,12 +75,10 @@ export const logout = async (req, res) => {
                 new: true,
             },
         )
-
         res.removeHeader(JWT_CONSTANTS.HEADER_ACCESS_TOKEN)
         res.removeHeader(JWT_CONSTANTS.HEADER_REFRESH_TOKEN)
         deleteCookie(res, JWT_CONSTANTS.COOKIE_ACCESS_TOKEN)
         deleteCookie(res, JWT_CONSTANTS.COOKIE_REFRESH_TOKEN)
-
         return res.status(httpStatus.OK).json({
             message: 'Đăng xuất thành công',
         })
@@ -96,31 +92,25 @@ export const logout = async (req, res) => {
 export const refreshToken = async (req, res) => {
     try {
         const { refreshToken } = req.body
-
         if (!refreshToken) {
             return res.status(httpStatus.BAD_REQUEST).json({
-                message: 'Không thấy refresh token',
+                message: 'Không thấy mã token để làm mới',
             })
         }
-
         const tokenRecord = await User.findOne({ refreshToken: refreshToken })
-
         if (!tokenRecord) {
             return res.status(httpStatus.UNAUTHORIZED).json({
-                message: 'Refresh token không hợp lệ',
+                message: 'Token không hợp lệ',
             })
         }
-
         jwt.verify(refreshToken, jwtSecret, async (err, user) => {
             if (err) {
                 return res.status(httpStatus.UNAUTHORIZED).json({
-                    message: 'Refresh token không hợp lệ',
+                    message: 'Token không hợp lệ',
                 })
             }
-
             const accessToken = generateAccessToken(res, user)
             const refreshToken = generateRefreshToken(res, user)
-
             await User.findByIdAndUpdate(user._id,
                 {
                     accessToken: accessToken,
@@ -130,7 +120,6 @@ export const refreshToken = async (req, res) => {
                     new: true,
                 },
             )
-
             return res.status(httpStatus.OK).json({
                 data: {
                     accessToken: accessToken,
