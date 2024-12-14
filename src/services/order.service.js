@@ -1,7 +1,7 @@
 import config from '#configs/environment'
-import moment, { now } from 'moment'
+import moment from 'moment'
 import httpStatus from 'http-status'
-import hmacSHA256 from 'crypto-js/hmac-sha256'
+import hmacSHA256 from 'crypto-js/hmac-sha256.js'
 import axios from 'axios'
 import { genericOrderCodeUtil } from '#utils/genericOrderCode'
 import Flight from '#models/flight'
@@ -124,7 +124,7 @@ export const getOrderStatus = async (req, res) => {
             order.status = ORDER_STATUS.FAILURE
         } else if (response.data.return_code === 3) {
             order.status = ORDER_STATUS.PENDING
-        } else if (response.data.sub_return_code === -54 || order.timeExpired > now) {
+        } else if (response.data.sub_return_code === -54 || order.timeExpired > moment.now()) {
             order.status = ORDER_STATUS.EXPIRED
         }
         await order.save()
