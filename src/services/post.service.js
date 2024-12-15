@@ -1,7 +1,6 @@
 import httpStatus from 'http-status'
 import { PAGE, PER_PAGE } from '#constants/pagination'
 import Post from '#models/post'
-import Plane from '../models/plane.model.js'
 
 export const getListPosts = async (req, res) => {
     try {
@@ -46,7 +45,7 @@ export const createPost = async (req, res) => {
             message: 'Tạo bài viết thành công',
         })
     } catch (e) {
-        return res.status(e.status || httpStatus.BAD_REQUEST).json({
+        return res.status(e.status || httpStatus.INTERNAL_SERVER_ERROR).json({
             message: 'Lỗi khi tạo bài viết',
         })
     }

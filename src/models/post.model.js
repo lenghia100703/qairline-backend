@@ -4,7 +4,7 @@ import { POST_TYPE } from '#constants/postType'
 
 const postSchema = new mongoose.Schema(
     {
-        name: {
+        title: {
             type: String,
             required: true,
             trim: true,
