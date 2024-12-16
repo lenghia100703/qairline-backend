@@ -27,9 +27,14 @@ export const createOrder = async (req, res) => {
         }
         const items = []
         for (let i = 0; i < booking.seats.length; i++) {
-            let price = flight.price
+            const price = flight.price
             if (booking.seats[i].seatType === SEAT_TYPE.BUSINESS) {
-                price += 1000000
+                items.push({
+                    'seatNumber': booking.seats[i].seatNumber,
+                    'quantity': 1,
+                    'user': booking.userId,
+                    'price': price + 2000000,
+                })
             }
             items.push({
                 'seatNumber': booking.seats[i].seatNumber,
