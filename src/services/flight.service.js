@@ -18,7 +18,7 @@ export const createFlight = async (req, res) => {
         const airportFrom = await Airport.findById(airportFromId)
         const airportTo = await Airport.findById(airportToId)
         const capacity = parseInt(req.body.capacity)
-        const plane = await Plane.find({ code: req.body.planeCode })
+        const plane = await Plane.findOne({ code: req.body.planeCode })
         if (!airportFrom) {
             return res.status(httpStatus.NOT_FOUND).json({
                 message: 'Không tìm thấy sân bay khởi hành',
@@ -79,7 +79,8 @@ export const createFlight = async (req, res) => {
             message: 'Tạo chuyến bay thành công',
         })
     } catch (e) {
-        return res.status(e.status || httpStatus.BAD_REQUEST).json({
+        console.log(e)
+        return res.status(e.status || httpStatus.INTERNAL_SERVER_ERROR).json({
             message: 'Lỗi khi tạo chuyến bay',
         })
     }
