@@ -44,7 +44,7 @@ export const createFlight = async (req, res) => {
                 message: 'Thời gian cất cánh và hạ cánh không phù hợp',
             })
         }
-        const flightNumber = genericNumberFlight(req.body.planeCode)
+        const flightNumber = genericNumberFlight()
         const seats = []
         for (let i = 1; i < capacity; i++) {
             if (i <= 20) {
@@ -53,12 +53,13 @@ export const createFlight = async (req, res) => {
                     status: SEAT_STATUS.AVAILABLE,
                     type: SEAT_TYPE.BUSINESS,
                 })
+            } else {
+                seats.push({
+                    seatNumber: i,
+                    status: SEAT_STATUS.AVAILABLE,
+                    type: SEAT_TYPE.ECONOMY,
+                })
             }
-            seats.push({
-                seatNumber: i,
-                status: SEAT_STATUS.AVAILABLE,
-                type: SEAT_TYPE.ECONOMY,
-            })
         }
         const flight = new Flight({
             name: req.body.name,
