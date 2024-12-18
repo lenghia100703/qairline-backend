@@ -47,7 +47,7 @@ export const createFlight = async (req, res) => {
         const flightNumber = genericNumberFlight()
         const seats = []
         for (let i = 1; i < capacity; i++) {
-            if (i <= 20) {
+            if (i <= 24) {
                 seats.push({
                     seatNumber: i,
                     status: SEAT_STATUS.AVAILABLE,
