@@ -19,6 +19,10 @@ router
     .post(authorize(), orderController.getOrderStatus)
 
 router
+    .route('/booking/:bookingId')
+    .get(authorize(), orderController.getOrderByBookingId)
+
+router
     .route('/:orderId')
     .get(authorize([ROLES.ADMIN]), orderController.getOrderById)
     .delete(authorize([ROLES.ADMIN]), orderController.deleteOrder)

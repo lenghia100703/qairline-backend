@@ -33,6 +33,7 @@ export const getListBookings = async (req, res) => {
             perPage,
             flightNumber,
             username,
+            userId,
             status,
         } = req.query
         if (!page || !perPage) {
@@ -66,8 +67,10 @@ export const getListBookings = async (req, res) => {
         if (flightIds.length > 0) {
             filter.flightId = { $in: flightIds }
         }
-        if (userIds.length > 0) {
-            filter.userId = { $in: userIds }
+        if (userId) {
+            filter.userId = userId;
+        } else if (userIds.length > 0) {
+            filter.userId = { $in: userIds };
         }
         if (status) {
             filter.status = status

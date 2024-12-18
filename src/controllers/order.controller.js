@@ -24,3 +24,7 @@ export async function getOrderStatus(req, res) {
     await orderService.getOrderStatus(req, res)
 }
 
+export async function getOrderByBookingId(req, res) {
+    await orderService.getOrderByBookingId(req, res)
+}
+

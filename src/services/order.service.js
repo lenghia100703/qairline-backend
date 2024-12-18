@@ -14,6 +14,7 @@ import { PAGE, PER_PAGE } from '#constants/pagination'
 import { ROLES } from '#constants/role'
 import Booking from '#models/booking'
 import { BOOKING_STATUS } from '#constants/bookingStatus'
+import mongoose from 'mongoose'
 
 export const createOrder = async (req, res) => {
     try {
@@ -320,6 +321,23 @@ export const deleteOrder = async (req, res) => {
     } catch (e) {
         return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({
             message: 'Lỗi khi xóa đơn hàng',
+        })
+    }
+}
+
+export const getOrderByBookingId = async (req, res) => {
+    try {
+        const { bookingId } = req.params
+        const order = await Order.findOne({
+            bookingId: new mongoose.Types.ObjectId(bookingId)
+        })
+        return res.status(httpStatus.OK).json({
+            data: order,
+            message: 'Lấy đơn hàng thành công',
+        })
+    } catch (e) {
+        return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({
+            message: 'Lỗi khi lấy đơn hàng',
         })
     }
 }
