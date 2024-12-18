@@ -30,6 +30,18 @@ const userSchema = new mongoose.Schema(
             index: true,
             trim: true,
         },
+        address: {
+            type: String,
+            trim: true,
+        },
+        phone: {
+            type: String,
+            trim: true,
+        },
+        cardId: {
+            type: String,
+            trim: true,
+        },
         services: {
             facebook: String,
             google: String,
