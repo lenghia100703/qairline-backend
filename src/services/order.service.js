@@ -175,9 +175,7 @@ export const getListOrders = async (req, res) => {
         }
         const filter = {}
         if (code) {
-            filter.code = {
-                $regex: new RegExp(code, 'i'),
-            }
+            filter.code = code
         }
         if (paymentMethod) {
             filter.paymentMethod = paymentMethod
