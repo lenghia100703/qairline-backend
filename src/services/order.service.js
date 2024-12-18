@@ -5,13 +5,15 @@ import hmacSHA256 from 'crypto-js/hmac-sha256.js'
 import axios from 'axios'
 import { genericOrderCodeUtil } from '#utils/genericOrderCode'
 import Flight from '#models/flight'
-import { SEAT_TYPE } from '#constants/seatStatus'
+import { SEAT_STATUS, SEAT_TYPE } from '#constants/seatStatus'
 import Order from '../models/order.model.js'
 import { PAYMENT_METHOD } from '#constants/paymentMethod'
 import qs from 'qs'
 import { ORDER_STATUS } from '#constants/orderStatus'
 import { PAGE, PER_PAGE } from '#constants/pagination'
 import { ROLES } from '#constants/role'
+import Booking from '#models/booking'
+import { BOOKING_STATUS } from '#constants/bookingStatus'
 
 export const createOrder = async (req, res) => {
     try {
@@ -67,9 +69,9 @@ export const createOrder = async (req, res) => {
             timeExpired:
                 req.body.paymentMethod === PAYMENT_METHOD.CASH
                     ? new Date(
-                          new Date(flight.arrivalTime).getTime() -
-                              60 * 60 * 1000 * 24
-                      )
+                        new Date(flight.arrivalTime).getTime() -
+                        60 * 60 * 1000 * 24,
+                    )
                     : new Date(orderZalo.app_time + 15 * 60 * 1000),
         })
         await order.save()
@@ -87,7 +89,7 @@ export const createOrder = async (req, res) => {
             null,
             {
                 params: orderZalo,
-            }
+            },
         )
         return res.status(httpStatus.CREATED).json({
             message:
@@ -124,24 +126,60 @@ export const getOrderStatus = async (req, res) => {
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
                 },
-            }
+            },
         )
         const order = await Order.findOne({
             code: postData.app_trans_id,
         })
+        if (!order) {
+            return res.status(httpStatus.NOT_FOUND).json({
+                message: 'Không tìm thấy order',
+            })
+        }
+        const booking = await Booking.findById(order.bookingId)
+        if (!booking) {
+            return res.status(httpStatus.NOT_FOUND).json({
+                message: 'Không tìm thấy đơn hàng',
+            })
+        }
+        const flight = await Flight.findById(booking.flightId)
+        if (!flight) {
+            return res.status(httpStatus.NOT_FOUND).json({
+                message: 'Không tìm thấy chuyến bay',
+            })
+        }
         if (response.data.return_code === 1) {
             order.status = ORDER_STATUS.SUCCESS
+            booking.status = BOOKING_STATUS.COMPLETED
+            booking.seats = booking.seats.map((seat) => ({
+                ...seat,
+                status: SEAT_STATUS.FULL,
+            }))
+            flight.seats = flight.seats.map((flightSeat) => {
+                const matchingSeat = booking.seats.find(
+                    (bookingSeat) => bookingSeat.seatNumber === flightSeat.seatNumber,
+                )
+                if (matchingSeat) {
+                    return { ...flightSeat, status: SEAT_STATUS.FULL }
+                }
+                return flightSeat
+            })
         } else if (response.data.return_code === 2) {
             order.status = ORDER_STATUS.FAILURE
+            booking.status = BOOKING_STATUS.CANCELED
         } else if (response.data.return_code === 3) {
             order.status = ORDER_STATUS.PENDING
+            booking.status = BOOKING_STATUS.PENDING
         } else if (
             response.data.sub_return_code === -54 ||
             order.timeExpired > moment.now()
         ) {
             order.status = ORDER_STATUS.EXPIRED
+            booking.status = BOOKING_STATUS.EXPIRED
         }
         await order.save()
+        await booking.save()
+        await flight.save()
         return res.status(httpStatus.OK).json({
             message:
                 'Lấy trạng thái đơn hàng thành công' ||
@@ -269,7 +307,7 @@ export const deleteOrder = async (req, res) => {
             },
             {
                 new: true,
-            }
+            },
         )
         if (!deletedOrder) {
             return res.status(httpStatus.NOT_FOUND).json({
