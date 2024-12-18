@@ -7,3 +7,7 @@ export const getUserById = async (req, res) => {
 export const getCurrentUser = async (req, res) => {
     await userService.getCurrentUser(req, res)
 }
+
+export const updateUser = async (req, res) => {
+    await userService.updateUser(req, res)
+}

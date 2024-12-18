@@ -18,6 +18,7 @@ const env = cleanEnv(process.env, {
     EMAIL_PORT: num({ default: 25 }),
     EMAIL_USERNAME: str(),
     EMAIL_PASSWORD: str(),
+    DEFAULT_AVATAR: str(),
     LOG_FORMAT: str({
         choices: Object.values(LogFormat),
         default: LogFormat.JSON,
@@ -56,6 +57,7 @@ export default Object.freeze({
     env: env.NODE_ENV,
     isProduction: env.NODE_ENV === 'production',
     port: env.PORT,
+    defaultAvatar: env.DEFAULT_AVATAR,
     github: {
         repo: env.GITHUB_REPO,
         owner: env.GITHUB_OWNER,

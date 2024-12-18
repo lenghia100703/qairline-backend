@@ -33,14 +33,17 @@ const userSchema = new mongoose.Schema(
         address: {
             type: String,
             trim: true,
+            default: '',
         },
         phone: {
             type: String,
             trim: true,
+            default: '',
         },
         cardId: {
             type: String,
             trim: true,
+            default: '',
         },
         services: {
             facebook: String,
@@ -55,6 +58,7 @@ const userSchema = new mongoose.Schema(
         avatar: {
             type: String,
             trim: true,
+            default: config.defaultAvatar,
         },
         accessToken: {
             type: String,
@@ -87,7 +91,17 @@ userSchema.pre('save', async function save(next) {
 userSchema.method({
     transform() {
         const transformed = {}
-        const fields = ['_id', 'username', 'email', 'avatar', 'role', 'createdAt', 'updatedAt', 'accessToken']
+        const fields = [
+            '_id',
+            'username',
+            'email',
+            'avatar',
+            'role',
+            'accessToken',
+            'cardId',
+            'phone',
+            'address',
+        ]
 
         for (const field of fields) {
             transformed[field] = this[field]

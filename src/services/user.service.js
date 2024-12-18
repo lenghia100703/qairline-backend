@@ -31,3 +31,23 @@ export const getCurrentUser = async (req, res) => {
         })
     }
 }
+
+export const updateUser = async (req, res) => {
+    try {
+        const updatedUser = await User.findByIdAndUpdate(
+            req.user._id,
+            req.body,
+            {
+                new: true
+            }
+        )
+        return res.status(httpStatus.OK).json({
+            data: updatedUser.transform(),
+            message: 'Cập nhật thông tin thành công',
+        })
+    } catch (e) {
+        return res.status(e.status || httpStatus.INTERNAL_SERVER_ERROR).json({
+            message: 'Lỗi cập nhật thông tin người dùng',
+        })
+    }
+}

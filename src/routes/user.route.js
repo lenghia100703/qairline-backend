@@ -8,6 +8,10 @@ router //
     .route('/me')
     .get(authorize(), userController.getCurrentUser)
 
+router
+    .route('/update')
+    .post(authorize(), userController.updateUser)
+
 router //
     .route('/:id')
     .get(authorize(), userController.getUserById)
