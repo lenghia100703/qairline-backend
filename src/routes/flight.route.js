@@ -20,7 +20,7 @@ router
 
 router
     .route('/:flightId')
-    .get(authorize([ROLES.ADMIN]), flightController.getFlightById)
+    .get(authorize(), flightController.getFlightById)
     .put(authorize([ROLES.ADMIN]), flightController.updateFlight)
     .delete(authorize([ROLES.ADMIN]), flightController.deleteFlight)
 
