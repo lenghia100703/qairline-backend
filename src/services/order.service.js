@@ -64,7 +64,7 @@ export const createOrder = async (req, res) => {
             totalPrice: orderZalo.amount,
             paymentMethod: req.body.paymentMethod,
             timeExpired: req.body.paymentMethod === PAYMENT_METHOD.CASH
-                ? new Date(new Date(flight.arrivalTime).getTime() - 60 * 60 * 1000)
+                ? new Date(new Date(flight.arrivalTime).getTime() - 60 * 60 * 1000 * 24)
                 : new Date(orderZalo.app_time + 15 * 60 * 1000),
         })
         await order.save()

@@ -7,6 +7,7 @@ import airportRoutes from '#routes/airport'
 import orderRoutes from '#routes/order'
 import planeRoutes from '#routes/plane'
 import postRoutes from '#routes/post'
+import bookingRoutes from '#routes/booking'
 
 const router = express.Router()
 
@@ -18,5 +19,6 @@ router.use('/airport', airportRoutes)
 router.use('/order', orderRoutes)
 router.use('/plane', planeRoutes)
 router.use('/post', postRoutes)
+router.use('/booking', bookingRoutes)
 
 export default router
