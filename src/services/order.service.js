@@ -17,7 +17,7 @@ export const createOrder = async (req, res) => {
     try {
         const { booking } = req.body
         const embed_data = {
-            'redirecturl': config.zalo.redirectUrl,
+            redirecturl: config.zalo.redirectUrl,
         }
         const flight = await Flight.findById(booking.flightId)
         if (!flight) {
@@ -28,20 +28,21 @@ export const createOrder = async (req, res) => {
         const items = []
         for (let i = 0; i < booking.seats.length; i++) {
             const price = flight.price
-            if (booking.seats[i].seatType === SEAT_TYPE.BUSINESS) {
+            if (booking.seats[i].type === SEAT_TYPE.BUSINESS) {
                 items.push({
-                    'seatNumber': booking.seats[i].seatNumber,
-                    'quantity': 1,
-                    'user': booking.userId,
-                    'price': price + 2000000,
+                    seatNumber: booking.seats[i].seatNumber,
+                    quantity: 1,
+                    user: booking.userId,
+                    price: price + 2000000,
+                })
+            } else {
+                items.push({
+                    seatNumber: booking.seats[i].seatNumber,
+                    quantity: 1,
+                    user: booking.userId,
+                    price: price,
                 })
             }
-            items.push({
-                'seatNumber': booking.seats[i].seatNumber,
-                'quantity': 1,
-                'user': booking.userId,
-                'price': price,
-            })
         }
         const transId = genericOrderCodeUtil()
         const orderZalo = {
@@ -55,6 +56,7 @@ export const createOrder = async (req, res) => {
             description: `Thanh toán ${items.length} vé máy bay với số đơn hàng ${transId}`,
             bank_code: 'zalopayapp',
         }
+        console.log(items)
         const data = `${config.zalo.appId}|${orderZalo.app_trans_id}|${orderZalo.app_user}|${orderZalo.amount}|${orderZalo.app_time}|${orderZalo.embed_data}|${orderZalo.item}`
         orderZalo.mac = hmacSHA256(data, config.zalo.key1).toString()
         const order = new Order({
@@ -63,9 +65,13 @@ export const createOrder = async (req, res) => {
             totalQuantity: items.length,
             totalPrice: orderZalo.amount,
             paymentMethod: req.body.paymentMethod,
-            timeExpired: req.body.paymentMethod === PAYMENT_METHOD.CASH
-                ? new Date(new Date(flight.arrivalTime).getTime() - 60 * 60 * 1000 * 24)
-                : new Date(orderZalo.app_time + 15 * 60 * 1000),
+            timeExpired:
+                req.body.paymentMethod === PAYMENT_METHOD.CASH
+                    ? new Date(
+                          new Date(flight.arrivalTime).getTime() -
+                              60 * 60 * 1000 * 24
+                      )
+                    : new Date(orderZalo.app_time + 15 * 60 * 1000),
         })
         await order.save()
         if (req.body.paymentMethod === PAYMENT_METHOD.CASH) {
@@ -82,17 +88,18 @@ export const createOrder = async (req, res) => {
             null,
             {
                 params: orderZalo,
-            },
+            }
         )
         return res.status(httpStatus.CREATED).json({
-            message: 'Tạo đơn hàng thành công' || response.sub_return_message,
+            message:
+                'Tạo đơn hàng thành công' || response.data.sub_return_message,
             data: {
                 order: order,
                 banking: {
-                    zpTransToken: response.zp_trans_token,
-                    orderUrl: response.order_url,
-                    orderToken: response.order_token,
-                    qrCode: response.qr_code,
+                    zpTransToken: response.data.zp_trans_token,
+                    orderUrl: response.data.order_url,
+                    orderToken: response.data.order_token,
+                    qrCode: response.data.qr_code,
                 },
             },
         })
@@ -118,7 +125,7 @@ export const getOrderStatus = async (req, res) => {
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
                 },
-            },
+            }
         )
         const order = await Order.findOne({
             code: postData.app_trans_id,
@@ -129,12 +136,17 @@ export const getOrderStatus = async (req, res) => {
             order.status = ORDER_STATUS.FAILURE
         } else if (response.data.return_code === 3) {
             order.status = ORDER_STATUS.PENDING
-        } else if (response.data.sub_return_code === -54 || order.timeExpired > moment.now()) {
+        } else if (
+            response.data.sub_return_code === -54 ||
+            order.timeExpired > moment.now()
+        ) {
             order.status = ORDER_STATUS.EXPIRED
         }
         await order.save()
         return res.status(httpStatus.OK).json({
-            message: 'Lấy trạng thái đơn hàng thành công' || response.data.sub_return_message,
+            message:
+                'Lấy trạng thái đơn hàng thành công' ||
+                response.data.sub_return_message,
             data: {
                 orderCode: postData.app_trans_id,
                 returnCode: response.data.return_code,
@@ -147,21 +159,17 @@ export const getOrderStatus = async (req, res) => {
         })
     } catch (e) {
         return res.status(e.status || httpStatus.INTERNAL_SERVER_ERROR).json({
-            message: 'Lỗi khi kiểm tra trạng thái đơn hàng' || e.data.sub_return_message,
+            message:
+                'Lỗi khi kiểm tra trạng thái đơn hàng' ||
+                e.data.sub_return_message,
         })
     }
 }
 
 export const getListOrders = async (req, res) => {
     try {
-        let {
-            page,
-            perPage,
-            code,
-            paymentMethod,
-            status,
-            isDeleted,
-        } = req.query
+        let { page, perPage, code, paymentMethod, status, isDeleted } =
+            req.query
         if (!page || !perPage) {
             page = PAGE
             perPage = PER_PAGE
@@ -264,7 +272,7 @@ export const deleteOrder = async (req, res) => {
             },
             {
                 new: true,
-            },
+            }
         )
         if (!deletedOrder) {
             return res.status(httpStatus.NOT_FOUND).json({
