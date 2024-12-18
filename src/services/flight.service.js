@@ -80,7 +80,6 @@ export const createFlight = async (req, res) => {
             message: 'Tạo chuyến bay thành công',
         })
     } catch (e) {
-        console.log(e)
         return res.status(e.status || httpStatus.INTERNAL_SERVER_ERROR).json({
             message: 'Lỗi khi tạo chuyến bay',
         })

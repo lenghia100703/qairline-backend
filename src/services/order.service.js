@@ -56,7 +56,6 @@ export const createOrder = async (req, res) => {
             description: `Thanh toán ${items.length} vé máy bay với số đơn hàng ${transId}`,
             bank_code: 'zalopayapp',
         }
-        console.log(items)
         const data = `${config.zalo.appId}|${orderZalo.app_trans_id}|${orderZalo.app_user}|${orderZalo.amount}|${orderZalo.app_time}|${orderZalo.embed_data}|${orderZalo.item}`
         orderZalo.mac = hmacSHA256(data, config.zalo.key1).toString()
         const order = new Order({
