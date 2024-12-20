@@ -329,7 +329,7 @@ export const getOrderByBookingId = async (req, res) => {
     try {
         const { bookingId } = req.params
         const order = await Order.findOne({
-            bookingId: new mongoose.Types.ObjectId(bookingId)
+            bookingId: new mongoose.Types.ObjectId(bookingId),
         })
         return res.status(httpStatus.OK).json({
             data: order,
@@ -341,3 +341,69 @@ export const getOrderByBookingId = async (req, res) => {
         })
     }
 }
+
+export const updateOrder = async (req, res) => {
+    try {
+        const { orderId } = req.params
+        const order = await Order.findByIdAndUpdate(
+            orderId,
+            req.body,
+            { new: true },
+        )
+        if (!order) {
+            return res.status(httpStatus.NOT_FOUND).json({
+                message: 'Không tìm thấy đơn hàng',
+            })
+        }
+        let bookingStatus = req.body.status
+        if (req.body.status === ORDER_STATUS.SUCCESS) {
+            bookingStatus = BOOKING_STATUS.COMPLETED
+        }
+        const booking = await Booking.findById(order.bookingId)
+        if (!booking) {
+            return res.status(httpStatus.NOT_FOUND).json({
+                message: 'Không tìm thấy booking liên quan',
+            })
+        }
+        const flight = await Flight.findById(booking.flightId)
+        if (!flight) {
+            return res.status(httpStatus.NOT_FOUND).json({
+                message: 'Không tìm thấy chuyến bay',
+            })
+        }
+        booking.status = bookingStatus
+        if (booking.seats && Array.isArray(booking.seats)) {
+            booking.seats = booking.seats.map((seat) => ({
+                ...seat,
+                status: bookingStatus === BOOKING_STATUS.COMPLETED
+                    ? SEAT_STATUS.FULL
+                    : SEAT_STATUS.AVAILABLE,
+            }))
+        }
+        flight.seats = flight.seats.map((flightSeat) => {
+            const matchingSeat = booking.seats.find(
+                (bookingSeat) => bookingSeat.seatNumber === flightSeat.seatNumber,
+            )
+            if (matchingSeat) {
+                return {
+                    ...flightSeat, status: BOOKING_STATUS.COMPLETED
+                        ? SEAT_STATUS.FULL
+                        : SEAT_STATUS.AVAILABLE,
+                }
+            }
+            return flightSeat
+        })
+        await booking.save()
+        await flight.save()
+        return res.status(httpStatus.OK).json({
+            data: order,
+            message: 'Cập nhật đơn hàng thành công',
+        })
+    } catch (e) {
+        console.error(e)
+        return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({
+            message: 'Lỗi khi cập nhật đơn hàng',
+        })
+    }
+}
+

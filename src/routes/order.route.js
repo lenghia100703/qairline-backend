@@ -25,6 +25,7 @@ router
 router
     .route('/:orderId')
     .get(authorize([ROLES.ADMIN]), orderController.getOrderById)
+    .put(authorize([ROLES.ADMIN]), orderController.updateOrder)
     .delete(authorize([ROLES.ADMIN]), orderController.deleteOrder)
 
 export default router

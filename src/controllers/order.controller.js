@@ -28,3 +28,7 @@ export async function getOrderByBookingId(req, res) {
     await orderService.getOrderByBookingId(req, res)
 }
 
+export async function updateOrder(req, res) {
+    await orderService.updateOrder(req, res)
+}
+
