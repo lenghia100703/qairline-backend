@@ -172,6 +172,12 @@ export const cancelBooking = async (req, res) => {
                 message: 'Không tìm thấy thông tin đặt vé',
             })
         }
+        const flight = await Flight.findById(booking.flightId)
+        if (!flight) {
+            return res.status(httpStatus.NOT_FOUND).json({
+                message: 'Không tìm thấy chuyến bay',
+            })
+        }
         const createdAt = new Date(booking.createdAt)
         const now = new Date()
         const oneDayInMillis = 24 * 60 * 60 * 1000
@@ -186,7 +192,17 @@ export const cancelBooking = async (req, res) => {
                 seat.status = SEAT_STATUS.AVAILABLE
             })
         }
+        flight.seats = flight.seats.map((flightSeat) => {
+            const matchingSeat = booking.seats.find(
+                (bookingSeat) => bookingSeat.seatNumber === flightSeat.seatNumber,
+            )
+            if (matchingSeat) {
+                return { ...flightSeat, status: SEAT_STATUS.AVAILABLE }
+            }
+            return flightSeat
+        })
         await booking.save()
+        await flight.save()
         return res.status(httpStatus.OK).json({
             message: 'Hủy đặt vé thành công',
         })
