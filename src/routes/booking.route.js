@@ -10,7 +10,7 @@ router
     .post(authorize(), bookingController.createBooking)
 
 router
-    .route('/canceled/:bookingId')
+    .route('/cancel/:bookingId')
     .post(authorize(), bookingController.cancelBooking)
 
 router
