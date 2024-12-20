@@ -10,6 +10,10 @@ router
     .post(authorize(), bookingController.createBooking)
 
 router
+    .route('/canceled/:bookingId')
+    .post(authorize(), bookingController.cancelBooking)
+
+router
     .route('/:bookingId')
     .get(authorize(), bookingController.getBookingById)
     .put(authorize(), bookingController.updateBooking)

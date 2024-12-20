@@ -4,6 +4,8 @@ import Booking from '#models/booking'
 import { PAGE, PER_PAGE } from '#constants/pagination'
 import Flight from '#models/flight'
 import User from '#models/user'
+import { SEAT_STATUS } from '#constants/seatStatus'
+import { BOOKING_STATUS } from '#constants/bookingStatus'
 
 export const createBooking = async (req, res) => {
     try {
@@ -68,9 +70,9 @@ export const getListBookings = async (req, res) => {
             filter.flightId = { $in: flightIds }
         }
         if (userId) {
-            filter.userId = userId;
+            filter.userId = userId
         } else if (userIds.length > 0) {
-            filter.userId = { $in: userIds };
+            filter.userId = { $in: userIds }
         }
         if (status) {
             filter.status = status
@@ -157,6 +159,40 @@ export const deleteBooking = async (req, res) => {
     } catch (e) {
         return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({
             message: 'Lỗi khi xóa đặt vé',
+        })
+    }
+}
+
+export const cancelBooking = async (req, res) => {
+    try {
+        const { bookingId } = req.params
+        const booking = await Booking.findById(bookingId)
+        if (!booking) {
+            return res.status(httpStatus.NOT_FOUND).json({
+                message: 'Không tìm thấy thông tin đặt vé',
+            })
+        }
+        const createdAt = new Date(booking.createdAt)
+        const now = new Date()
+        const oneDayInMillis = 24 * 60 * 60 * 1000
+        if (now - createdAt > oneDayInMillis) {
+            return res.status(httpStatus.BAD_REQUEST).json({
+                message: 'Chỉ có thể hủy vé trong vòng 1 ngày kể từ lúc đặt',
+            })
+        }
+        booking.status = BOOKING_STATUS.CANCELED
+        if (booking.seats && Array.isArray(booking.seats)) {
+            booking.seats.forEach(seat => {
+                seat.status = SEAT_STATUS.AVAILABLE
+            })
+        }
+        await booking.save()
+        return res.status(httpStatus.OK).json({
+            message: 'Hủy đặt vé thành công',
+        })
+    } catch (e) {
+        return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({
+            message: 'Lỗi khi hủy đặt vé',
         })
     }
 }

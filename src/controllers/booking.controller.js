@@ -19,3 +19,7 @@ export async function updateBooking(req, res) {
 export async function deleteBooking(req, res) {
     await bookingService.deleteBooking(req, res)
 }
+
+export async function cancelBooking(req, res) {
+    await bookingService.cancelBooking(req, res)
+}
